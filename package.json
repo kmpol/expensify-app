@@ -19,12 +19,12 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node server/server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "test-jest": "jest --config=jest.config.json",
     "eject": "react-scripts eject",
-    "heroku-postbuild": "node server/server.js"
+    "heroku-postbuild": "yarn run build"
   },
   "eslintConfig": {
     "extends": [
