@@ -86,3 +86,13 @@ test('Should not edit an expense if not exist', () => {
 
     expect(state).toEqual(expenses)
 })
+
+test('Should set expenses', () => {
+    const aciton = {
+        type: 'SET_EXPENSES',
+        expenses: expenses
+    }
+    const state = expensesReducer(expensesReducer, aciton)
+
+    expect(state).toEqual(expenses)
+})
