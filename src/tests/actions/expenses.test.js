@@ -1,6 +1,6 @@
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import { addExpense, editExpense, removeExpense, startAddExpense, setExpenses, startSetExpenses } from '../../actions/expenses'
+import { addExpense, editExpense, removeExpense, startAddExpense, setExpenses, startSetExpenses, startRemoveExpense, startEditExpense } from '../../actions/expenses'
 import expenses from '../fixtures/expenses'
 import database from '../../firebase/firebase'
 
@@ -11,7 +11,7 @@ beforeEach((done) => {
     expenses.forEach(({ id, description, note, amount, createdAt }) => {
         expensesData[id] = { description, note, amount, createdAt }
     })
-    database.ref('expenses').set(expensesData).then(() => done())
+    database.ref('expenses').set(expensesData).then(() => { done() })
 })
 
 test('Should setup remove expense action', () => {
@@ -19,6 +19,23 @@ test('Should setup remove expense action', () => {
     expect(action).toEqual({
         type: 'REMOVE_EXPENSE',
         id: '123321'
+    })
+})
+
+test('Should remove expense from firebase', (done) => {
+    const store = createMockStore({})
+    const id = expenses[2].id
+    store.dispatch(startRemoveExpense({ id })).then(() => {
+        const actions = store.getActions()
+        expect(actions[0]).toEqual({
+            type: 'REMOVE_EXPENSE',
+            id
+        })
+
+        return database.ref(`expenses/${id}`).once('value')
+    }).then((snapshot) => {
+        expect(snapshot.val()).toBeFalsy()
+        done()
     })
 })
 
@@ -30,6 +47,26 @@ test('Should update expense action', () => {
         updates: {
             note: 'updated'
         }
+    })
+})
+
+test('Should update expense in firebase', (done) => {
+    const store = createMockStore({})
+    const expenseToUpdate = expenses[1]
+    const updates = {
+        description: 'Rent updated!'
+    }
+    store.dispatch(startEditExpense(expenseToUpdate.id, updates)).then(() => {
+        const actions = store.getActions()
+        expect(actions[0]).toEqual({
+            type: 'EDIT_EXPENSE',
+            id: expenseToUpdate.id,
+            updates
+        })
+        return database.ref(`expenses/${expenseToUpdate.id}`).once('value')
+    }).then((snapshot) => {
+        expect(snapshot.val().description).toBe('Rent updated!')
+        done()
     })
 })
 
@@ -109,3 +146,4 @@ test('Should fetch the expenses from firebase', (done) => {
         done()
     })
 })
+
