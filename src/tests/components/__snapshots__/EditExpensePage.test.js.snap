@@ -9,7 +9,7 @@ exports[`Should render Edit Expense Page 1`] = `
         "createdAt": 345600000,
         "description": "Credit card",
         "id": "3",
-        "note": "",
+        "note": "3",
       }
     }
     onSubmitJD={[Function]}
